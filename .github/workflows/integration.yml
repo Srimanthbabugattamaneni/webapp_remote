@@ -1,0 +1,41 @@
+name: Integration 
+ 
+
+env:
+  DB_HOST: ${{ secrets.HOST }}
+  DB_USER: ${{ secrets.USERNAME }}
+  DB_PASSWORD: ${{ secrets.PASSWORD }}
+  DB_NAME: ${{ secrets.DATABASE }}
+  DB_PORT: ${{secrets.PORT}}
+ 
+on:
+  pull_request:
+    branches:
+      - main
+ 
+ 
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+ 
+      - name: Install MySQL
+        run: |
+          sudo apt-get update
+          sudo systemctl start mysql.service
+          sudo mysql --user="${{ secrets.USERNAME }}" --password="${{ secrets.PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DATABASE }};"
+ 
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14.x"
+ 
+      - name: Install Dependencies
+        run: npm install
+ 
+      - name: Run Tests
+        run: npm test
+  
