@@ -7,7 +7,9 @@ sudo systemctl enable mysqld
 sudo systemctl start mysqld
 # Set root user password for MySQL and create database API
 # Note: The command is corrected to be properly enclosed and executed.
-sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'srimanth'; CREATE DATABASE API; SHOW GRANTS FOR 'root'@'localhost';"
+
+sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'srimanth'; CREATE DATABASE api; SHOW GRANTS FOR 'root'@'localhost';"
+
 
 # Create group csye6225 if it doesn't already exist
 sudo groupadd -f csye6225
