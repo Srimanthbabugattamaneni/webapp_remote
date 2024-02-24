@@ -1,0 +1,63 @@
+name: Packer Build
+env:
+  host: ${{ secrets.HOST }}
+  databaseUser: ${{ secrets.USERNAME }}
+  databasePassword: ${{ secrets.PASSWORD }}
+  databasePort: ${{ secrets.PORT }}
+  databaseName: ${{ secrets.DATABASE }}
+
+on:
+  pull_request:
+    types: [closed]
+
+
+jobs:
+  build:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0.4.0
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+    - name: Zip the web application files
+      run: zip -r webapp.zip ./
+
+    - name: Create .env file
+      run: |
+        cat << EOF > .env
+        DB_HOST: ${{ secrets.HOSTDB }}
+            DB_USER: ${{ secrets.USERNAME }}
+            DB_PASSWORD: ${{ secrets.PASSWORDDB }}
+            DB_NAME: ${{ secrets.DATABASE }}
+            DB_PORT: ${{secrets.PORT}}
+        EOF
+
+    - name: Install Packer
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get update && sudo apt-get install packer
+
+    - name: Initialize Packer
+      run: packer init .
+      working-directory: ./packer
+
+    - name: Format Packer template
+      run: packer fmt -check -diff .
+      working-directory: ./packer
+      continue-on-error: true  
+      
+    - name: Validate Packer template
+      run: packer validate .
+      working-directory: ./packer
+
+    # If everything is validated, you can add a step to build the image
+    - name: Build Packer image
+      run: packer build .
+      working-directory: ./packer
