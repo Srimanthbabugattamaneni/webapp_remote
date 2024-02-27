@@ -13,7 +13,7 @@ source "googlecompute" "centos_stream_8" {
   ssh_username        = "centos"
   image_name          = "centos-stream-8-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
   image_description   = "new image"
-  zone                = "us-east1-b"
+  zone                = "us-eas"
 }
 
 build {
