@@ -8,7 +8,7 @@ packer {
 }
 
 source "googlecompute" "centos_stream_8" {
-  project_id          = "devproject-414921"
+ 
   source_image_family = "centos-stream-8"
   ssh_username        = "centos"
   image_name          = "centos-stream-8-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
