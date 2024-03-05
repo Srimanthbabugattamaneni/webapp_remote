@@ -1,15 +1,4 @@
 #!/bin/bash
- 
- 
-# Install MySQL
-sudo dnf install -y mysql-server
-sudo systemctl enable mysqld
-sudo systemctl start mysqld
-# Set root user password for MySQL and create database API
-# Note: The command is corrected to be properly enclosed and executed.
-
-sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'srimanth'; CREATE DATABASE api; SHOW GRANTS FOR 'root'@'localhost';"
-
 
 # Create group csye6225 if it doesn't already exist
 sudo groupadd -f csye6225
@@ -36,7 +25,8 @@ cd /opt || exit
 sudo unzip webapp.zip
 sudo cp /tmp/.env /opt
 
-# Change directory ownership to user csye6g225
+# Change directory ownership to user csye6225
+
 sudo chown -R csye6225:csye6225 /opt
 
 # Set directory permissions
@@ -57,4 +47,7 @@ sudo systemctl enable csye6225
 sudo systemctl start csye6225
 
 # Optionally, check the status of the custom service
+
 sudo systemctl status csye6225
+sudo journalctl -xe
+
