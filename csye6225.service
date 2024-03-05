@@ -1,0 +1,20 @@
+[Unit]
+Description=CSYE 6225 index.js
+ConditionPathExists=/opt
+After=network.target
+
+[Service]
+Type=simple
+User=csye6225
+Group=csye6225
+WorkingDirectory=/opt
+ExecStartPre= /bin/bash -c 'while [ ! -f /opt/.env ]; do sleep 1; done'
+ExecStart=/usr/bin/node /opt/index.js
+Restart=always
+RestartSec=3
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=csye6225
+
+[Install]
+WantedBy=multi-user.target

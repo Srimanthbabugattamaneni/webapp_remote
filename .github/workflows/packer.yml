@@ -1,0 +1,67 @@
+name: Packer 
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+jobs:
+  packer:
+    runs-on: ubuntu-latest
+ 
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0.4.0'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+      
+    - name: Zip repository
+      run: |
+        zip -r webapp.zip ./
+        pwd
+    
+
+    - name: Setup Environment File
+      run: |
+            cat << EOF > .env
+            DB_HOST: ${{ secrets.HOST }}
+            DB_USER: ${{ secrets.USERNAME }}
+            DB_PASSWORD: ${{ secrets.PASSWORD }}
+            DB_NAME: ${{ secrets.DATABASE }}
+            DB_PORT: ${{secrets.PORT}}
+            EOF
+      shell: bash
+  
+  
+    - name: Install Packer
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get update && sudo apt-get install packer
+      shell: bash
+
+   
+
+  
+    - name: Initialize Packer
+      run: packer init .
+      working-directory: ./packer
+  
+    
+  
+      
+    - name: Format Packer template
+      run: |
+          packer fmt -check -diff .
+          if [ $? -ne 0 ]; then
+            echo "Packer templates need formatting. Run 'packer fmt' locally and push the changes."
+            exit 1
+          fi
+  
+    - name: Validate Packer template
+      run: packer validate .
+      working-directory: ./packer
