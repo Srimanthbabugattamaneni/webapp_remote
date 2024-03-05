@@ -7,8 +7,13 @@ env:
   databaseName: ${{ secrets.DATABASE }}
 
 on:
-  pull_request:
-    types: [closed]
+
+  pull_request_target:
+     types: [closed]
+     branches: [ "main" ]
+
+
+
 
 
 jobs:

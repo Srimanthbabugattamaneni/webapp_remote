@@ -26,10 +26,12 @@ sudo unzip webapp.zip
 sudo cp /tmp/.env /opt
 
 # Change directory ownership to user csye6225
+
 sudo chown -R csye6225:csye6225 /opt
 
 # Set directory permissions
 sudo chmod -R 750 /opt
+
 
 # Install Node.js dependencies and run tests
 sudo npm install
@@ -45,5 +47,7 @@ sudo systemctl enable csye6225
 sudo systemctl start csye6225
 
 # Optionally, check the status of the custom service
+
 sudo systemctl status csye6225
 sudo journalctl -xe
+
