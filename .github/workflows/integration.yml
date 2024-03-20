@@ -27,7 +27,8 @@ jobs:
           sudo apt-get update
           sudo systemctl start mysql.service
           sudo mysql --user="${{ secrets.USERNAME }}" --password="${{ secrets.PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DATABASE }};"
- 
+          sudo mkdir -p /var/log/webapp 2>/dev/null
+          
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
