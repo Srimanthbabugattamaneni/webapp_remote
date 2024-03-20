@@ -8,6 +8,10 @@ const logger = require('../logger');
 const healthCheck = async (req, res) => {
     try {
         await sequelize.authenticate();
+        logger.debug({
+          severity: 'DEBUG',
+          message: 'Attempt to db connection'
+        });
         logger.info({
           severity: 'INFO',
           message: 'Database connection successful'
@@ -73,8 +77,8 @@ const getUser = async (req, res) => {
           where: { username: basic.name } 
         });
         if (user === null) {
-          logger.error({
-            severity: 'ERROR',
+          logger.warn({
+            severity: 'WARN',
             message: 'Auth not provided correctly'
           });
           return res.status(400).json({ error: "User Not Found" });
