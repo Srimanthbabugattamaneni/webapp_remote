@@ -28,8 +28,8 @@ const createUser = async (req, res) => {
   
       const existingUser = await User.findOne({ where: { username } });
       if (existingUser) {
-        logger.debug({
-          severity: 'DEBUG',
+        logger.warn({
+          severity: 'WARN',
           message: 'Attempt to create a user that already exists'
         });
         return res.status(400).send('User already exists with this username.');
