@@ -3,6 +3,7 @@ const User = require('../model/user');
 const bcrypt = require('bcrypt');
 const basicAuth = require('basic-auth');
 const authenticate = require('../middlewares/basicAuth');
+const logger = require('../logger');
 
 const healthCheck = async (req, res) => {
     try {
