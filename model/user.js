@@ -36,7 +36,24 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
-}, {
+  isEmailVerified: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,  // Assuming new users are not verified by default
+    },
+  // create a new feiled to capture token
+   verificationToken: {
+    type: DataTypes.STRING,
+   },
+   tokenExpires: {
+    type: DataTypes.DATE,
+   },
+   mailSentAt: {
+    type:DataTypes.DATE,
+   },
+  
+},
+ {
   timestamps: false,
 });
 
