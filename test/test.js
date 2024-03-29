@@ -9,23 +9,24 @@ const User = require('../model/user')
 const request = supertest(app);
 
 before(async function() {
-    try {
-      await sequelize.sync({ force: true });
-      console.log('Database synced.');
-    } catch (error) {
-    }
-  });
+  this.timeout(10000);
+  try {
+    await sequelize.sync({ force: true });
+    console.log('Database synced.');
+  } catch (error) {
+    console.error('Error syncing database:', error);
+  }
+});
 
-  after(async () => {
-   
-    // Close the Sequelize connection
-    try {
-      await sequelize.close();
-      console.log('Sequelize connection closed successfully.');
-    } catch (error) {
-      console.error('Error closing Sequelize connection:', error);
-    }
-  });
+after(async () => {
+  try {
+    await sequelize.close();
+    console.log('Sequelize connection closed successfully.');
+  } catch (error) {
+    console.error('Error closing Sequelize connection:', error);
+  }
+});
+
   
 describe('Integration Tests', () => {
   const userData = {
@@ -41,6 +42,12 @@ describe('Integration Tests', () => {
     // Attempt to create account
     let createResponse = await request.post('/v1/user').send(userData);
     // The account may already exist from a previous test run
+
+    if (createResponse.status === 201) {
+      await User.update({ isEmailVerified: true }, { where: { username: userData.username } });
+    }
+    
+
     if (createResponse.status === 400) {
       console.log('User already exists, proceeding with tests assuming the user was previously created.');
     } else {

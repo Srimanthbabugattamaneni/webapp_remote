@@ -28,6 +28,11 @@ jobs:
           sudo systemctl start mysql.service
           sudo mysql --user="${{ secrets.USERNAME }}" --password="${{ secrets.PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DATABASE }};"
           sudo mkdir -p /var/log/webapp 2>/dev/null
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
           
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -36,6 +41,7 @@ jobs:
  
       - name: Install Dependencies
         run: npm install
+      
  
       - name: Run Tests
         run: npm test
