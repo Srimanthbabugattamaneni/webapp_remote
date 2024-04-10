@@ -7,20 +7,15 @@ env:
   databaseName: ${{ secrets.DATABASE }}
 
 on:
-
-   pull_request_target:
-     types: [closed]
-     branches: [ "main" ]
-
-
-   
-
+  push:
+    branches:
+      - cicd
 
 
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
+    #if github.event.pull_request.merged true
     runs-on: ubuntu-latest
 
     steps:
@@ -65,6 +60,91 @@ jobs:
       working-directory: ./packer
 
     # If everything is validated, you can add a step to build the image
-    - name: Build Packer image
-      run: packer build .
-      working-directory: ./packer
+   # - name: Build Packer image
+   #   run: packer build .
+#      working-directory: ./packer
+
+    - name: Get Latest Image 
+      run: |
+        echo "IMG_NAME=$(gcloud compute images list --project devproject-414921 --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')" >> $GITHUB_OUTPUT
+        echo "::set-output name=IMG_NAME::$IMG_NAME"
+        echo "IMG_NAME: $IMG_NAME"
+
+    - name: Get  Instance Group Manager
+      id: get_instancemanager
+      run: |
+        instancemanager=$(gcloud compute instance-groups managed list --regions ${{ secrets.REGION }} --format="value(name)" --limit 1)
+        echo "::set-output name=instancemanager::$instancemanager"
+        echo "instancemanager: $instancemanager"
+
+    - name: Get sql host IP
+      id: get_host
+      run: |
+            sqlhost=$(gcloud sql instances describe ${{ secrets.INSTANCE }} --format='get(ipAddresses[0].ipAddress)' --project=${{ secrets.PROJECT_ID }})
+            echo "::set-output name=sqlhost::$sqlhost"
+            echo "sqlhost: $sqlhost"
+    - name: Get  database password
+      id: get_dbpass
+      run: |
+          databasePassword=$(gcloud secrets versions access latest --secret="${{ secrets.DATABASEPASS_SECTID }}" --project=${{ secrets.PROJECT_ID }})
+          echo "::set-output name=databasePassword::$databasePassword"
+          echo "databasePassword: $databasePassword"
+
+      
+    - name: Get currentkeyring
+      id: get_keyRing
+      run: |
+        currentkeyring=$(gcloud kms keyrings list --location=${{ secrets.REGION }} --project=${{secrets.PROJECT_ID}} --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')
+        
+        echo "::set-output name=currentkeyring::$currentkeyring"
+        echo "currentkeyring=$currentkeyring"
+
+
+    - name: Get VM key
+      id: get_vm_key
+      run: |
+        vmkey=$(gcloud kms keys list --location=${{ secrets.REGION }} --keyring=${{steps.get_keyRing.outputs.currentkeyring}} --project=${{secrets.PROJECTID}} --filter="name:vm-machine-key-1" --format="value(name)")
+
+
+
+    - name: Create Instance Template
+      run: |
+       gcloud compute instance-templates create instance-template-$(date +%Y%m%d%H%M%S) \
+          --region=${{secrets.REGION}} \
+          --project=${{secrets.PROJECTID}} \
+          --machine-type=${{secrets.MACHINETYPE}} \
+          --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/subnetworks/srimanth-webapp\
+          --metadata=startup-script="#!/bin/bash
+            if [! -f "/opt/.env"]; then
+            touch /opt/.env
+            fi
+            echo 'DB_HOST=${{ steps.get_host.outputs.sqlhost }}' > /opt/.env
+            DB_USER: ${{ secrets.USERNAME }}
+            DB_NAME: ${{ secrets.DATABASE }}
+            DB_PASSWORD=${{ steps.get_dbpass.outputs.databasePassword }}
+            DB_DIALECT=mysql
+            DB_PORT=${{ secrets.PORT }}
+        EOF
+            
+            chown csye6225:csye6225 /opt/.env
+            systemctl restart webapp" \
+
+
+          --service-account=${{secrets.SERVICEACCOUNTEMAIL}} \
+          --scopes=https://www.googleapis.com/auth/cloud-platform \
+           --create-disk=auto-delete=yes,boot=yes,device-name=Disk1,image="projects/devproject-414921/global/images/${{steps.get_image.outputs.IMAGE_NAME}}",kms-key=${{steps.get_vm_key.outputs.vmkey}},mode=rw,size=20,type=pd-balanced \
+           --tags=http-server
+
+    - name: Configure Instance Groups
+      run: |
+        gcloud compute instance-groups managed rolling-action start-update ${{steps.get_instancemanager.outputs.instancemanager}} \
+          --version=template=https://compute.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/instanceTemplates/${{ steps.get_template.outputs.tempName }} \
+
+          --max-unavailable=3 \
+          --region=${{secrets.REGION}}
+
+    - name: Monitoring the instances
+      run: |
+        gcloud compute instance-groups managed wait-until ${{steps.get_instancemanager.outputs.instancemanager}} \
+          --version-target-reached \
+          --region=${{secrets.REGION}}
