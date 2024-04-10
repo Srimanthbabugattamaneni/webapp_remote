@@ -117,7 +117,7 @@ jobs:
                 systemctl restart webapp" \
               --service-account=${{ secrets.SERVICEACCOUNTEMAIL }} \
               --scopes=https://www.googleapis.com/auth/cloud-platform \
-              --create-disk=auto-delete=yes,boot=yes,device-name=Disk1,image="projects/devproject-414921/global/images/${{ steps.get_image.outputs.IMAGE_NAME }}",kms-key=${{ steps.get_vm_key.outputs.vmkey }},mode=rw,size=20,type=pd-balanced \
+              --create-disk=auto-delete=yes,boot=yes,device-name=Disk1,image="projects/devproject-414921/global/images/${{ steps.get_IMG_NAME.outputs.IMG_NAME }}",kms-key=${{ steps.get_vm_key.outputs.vmkey }},mode=rw,size=20,type=pd-balanced \
               --tags=http-server
         
 
