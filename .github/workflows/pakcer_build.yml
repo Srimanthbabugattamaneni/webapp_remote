@@ -124,7 +124,7 @@ jobs:
     - name : template name
       id: get_template
       run: |
-        template_name = $(gcloud compute instance-templates list --project ${{ secrets.PROJECT_ID }}  --sort-by=~creationTimestamp --limit=1 --format='value(name)')
+        template_name=$(gcloud compute instance-templates list --project ${{ secrets.PROJECT_ID }}  --sort-by=~creationTimestamp --limit=1 --format='value(name)')
         echo "::set-output name=template_name::$template_name"
         
 
