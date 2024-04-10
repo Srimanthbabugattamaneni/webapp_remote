@@ -77,19 +77,19 @@ jobs:
         echo "::set-output name=instancemanager::$instancemanager"
         echo "instancemanager: $instancemanager"
 
-    - name: Get sql host IP
-      id: get_host
-      run: |
-              sqlhost=$(gcloud sql instances describe projects/${{ secrets.PROJECT_ID }}/instances/${{ secrets.INSTANCE }} --format='get(ipAddresses[0].ipAddress)')
-              echo "::set-output name=sqlhost::$sqlhost"
-              echo "sqlhost: $sqlhost"
+    # - name: Get sql host IP
+    #   id: get_host
+    #   run: |
+    #           sqlhost=$(gcloud sql instances describe projects/${{ secrets.PROJECT_ID }}/instances/${{ secrets.INSTANCE }} --format='get(ipAddresses[0].ipAddress)')
+    #           echo "::set-output name=sqlhost::$sqlhost"
+    #           echo "sqlhost: $sqlhost"
       
-    - name: Get  database password
-      id: get_dbpass
-      run: |
-          databasePassword=$(gcloud secrets versions access latest --secret="${{ secrets.DATABASEPASS_SECTID }}" --project=${{ secrets.PROJECT_ID }})
-          echo "::set-output name=databasePassword::$databasePassword"
-          echo "databasePassword: $databasePassword"
+    # - name: Get  database password
+    #   id: get_dbpass
+    #   run: |
+    #       databasePassword=$(gcloud secrets versions access latest --secret="${{ secrets.DATABASEPASS_SECTID }}" --project=${{ secrets.PROJECT_ID }})
+    #       echo "::set-output name=databasePassword::$databasePassword"
+    #       echo "databasePassword: $databasePassword"
 
       
     - name: Get currentkeyring
@@ -119,10 +119,10 @@ jobs:
             if [! -f "/opt/.env"]; then
             touch /opt/.env
             fi
-            echo 'DB_HOST=${{ steps.get_host.outputs.sqlhost }}' > /opt/.env
+            echo 'DB_HOST=${{ secrets.HOSTIP }}' > /opt/.env
             DB_USER: ${{ secrets.USERNAME }}
             DB_NAME: ${{ secrets.DATABASE }}
-            DB_PASSWORD=${{ steps.get_dbpass.outputs.databasePassword }}
+            DB_PASSWORD=${{ secrets.IPPASSWORD }}
             DB_DIALECT=mysql
             DB_PORT=${{ secrets.PORT }}
         EOF
