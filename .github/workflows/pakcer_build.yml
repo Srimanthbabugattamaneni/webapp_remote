@@ -80,9 +80,10 @@ jobs:
     - name: Get sql host IP
       id: get_host
       run: |
-            sqlhost=$(gcloud sql instances describe ${{ secrets.INSTANCE }} --format='get(ipAddresses[0].ipAddress)' --project=${{ secrets.PROJECT_ID }})
-            echo "::set-output name=sqlhost::$sqlhost"
-            echo "sqlhost: $sqlhost"
+              sqlhost=$(gcloud sql instances describe projects/${{ secrets.PROJECT_ID }}/instances/${{ secrets.INSTANCE }} --format='get(ipAddresses[0].ipAddress)')
+              echo "::set-output name=sqlhost::$sqlhost"
+              echo "sqlhost: $sqlhost"
+      
     - name: Get  database password
       id: get_dbpass
       run: |
