@@ -173,7 +173,7 @@ const verifyEmail = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      where: { verificationToken: token, tokenExpires: { [Op.gt]: new Date() } }
+      where: { verificationToken: token }
     });
 
     if (!user) {
