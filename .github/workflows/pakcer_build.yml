@@ -114,7 +114,7 @@ jobs:
       run: |
        gcloud compute instance-templates create instance-template-$(date +%Y%m%d%H%M%S) \
           --region=${{secrets.REGION}} \
-          --project=${{secrets.PROJECTID}} \
+          --project=${{secrets.PROJECT_ID}} \
           --machine-type=${{secrets.MACHINETYPE}} \
           --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/subnetworks/srimanth-webapp\
           --metadata=startup-script="#!/bin/bash
