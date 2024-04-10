@@ -77,20 +77,6 @@ jobs:
         echo "::set-output name=instancemanager::$instancemanager"
         echo "instancemanager: $instancemanager"
 
-    # - name: Get sql host IP
-    #   id: get_host
-    #   run: |
-    #           sqlhost=$(gcloud sql instances describe projects/${{ secrets.PROJECT_ID }}/instances/${{ secrets.INSTANCE }} --format='get(ipAddresses[0].ipAddress)')
-    #           echo "::set-output name=sqlhost::$sqlhost"
-    #           echo "sqlhost: $sqlhost"
-      
-    # - name: Get  database password
-    #   id: get_dbpass
-    #   run: |
-    #       databasePassword=$(gcloud secrets versions access latest --secret="${{ secrets.DATABASEPASS_SECTID }}" --project=${{ secrets.PROJECT_ID }})
-    #       echo "::set-output name=databasePassword::$databasePassword"
-    #       echo "databasePassword: $databasePassword"
-
       
     - name: Get currentkeyring
       id: get_keyRing
@@ -133,7 +119,7 @@ jobs:
             systemctl restart webapp" \
 
 
-           --service-account=${{ secrets.SERVICE_ACCOUNT_EMAIL }} \
+           --service-account=${{ secrets.SERVICEACCOUNTEMAIL }} \
            --scopes=https://www.googleapis.com/auth/cloud-platform \
            --create-disk=auto-delete=yes,boot=yes,device-name=Disk1,image="projects/devproject-414921/global/images/${{steps.get_image.outputs.IMAGE_NAME}}",kms-key=${{steps.get_vm_key.outputs.vmkey}},mode=rw,size=20,type=pd-balanced \
            --tags=http-server
