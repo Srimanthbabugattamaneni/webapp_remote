@@ -104,7 +104,7 @@ jobs:
     - name: Get VM key
       id: get_vm_key
       run: |
-          vmkey=$(gcloud kms keys list --location=${{ secrets.LOCATION }} --keyring=[KEYRING_NAME] --project=${{ secrets.PROJECT_ID }} --filter="name=vm-machine-key-3" --format="value(name)")
+          vmkey=$(gcloud kms keys list --location=${{ secrets.REGION }} --keyring=[KEYRING_NAME] --project=${{ secrets.PROJECT_ID }} --filter="name=vm-machine-key-3" --format="value(name)")
           echo "::set-output name=vmkey::$vmkey"
       
       
