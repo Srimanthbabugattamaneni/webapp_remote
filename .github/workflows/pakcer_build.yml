@@ -98,31 +98,28 @@ jobs:
 
     - name: Create Instance Template
       run: |
-       gcloud compute instance-templates create instance-template-$(date +%Y%m%d%H%M%S) \
-          --region=${{secrets.REGION}} \
-          --project=${{secrets.PROJECT_ID}} \
-          --machine-type=${{secrets.MACHINETYPE}} \
-          --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/subnetworks/srimanth-webapp\
-          --metadata=startup-script="#!/bin/bash
-            if [! -f "/opt/.env"]; then
-            touch /opt/.env
-            fi
-            echo 'DB_HOST=${{ secrets.HOSTIP }}' > /opt/.env
-            DB_USER: ${{ secrets.USERNAME }}
-            DB_NAME: ${{ secrets.DATABASE }}
-            DB_PASSWORD=${{ secrets.IPPASSWORD }}
-            DB_DIALECT=mysql
-            DB_PORT=${{ secrets.PORT }}
-        EOF
-            
-            chown csye6225:csye6225 /opt/.env
-            systemctl restart webapp" \
-
-
-           --service-account=${{ secrets.SERVICEACCOUNTEMAIL }} \
-           --scopes=https://www.googleapis.com/auth/cloud-platform \
-           --create-disk=auto-delete=yes,boot=yes,device-name=Disk1,image="projects/devproject-414921/global/images/${{steps.get_image.outputs.IMAGE_NAME}}",kms-key=${{steps.get_vm_key.outputs.vmkey}},mode=rw,size=20,type=pd-balanced \
-           --tags=http-server
+            gcloud compute instance-templates create instance-template-$(date +%Y%m%d%H%M%S) \
+              --region=${{ secrets.REGION }} \
+              --project=${{ secrets.PROJECT_ID }} \
+              --machine-type=${{ secrets.MACHINETYPE }} \
+              --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/subnetworks/srimanth-webapp \
+              --metadata=startup-script="#!/bin/bash
+                if [ ! -f '/opt/.env' ]; then
+                  touch /opt/.env
+                fi
+                echo 'DB_HOST=${{ secrets.HOSTIP }}' > /opt/.env
+                echo 'DB_USER=${{ secrets.USERNAME }}' >> /opt/.env
+                echo 'DB_NAME=${{ secrets.DATABASE }}' >> /opt/.env
+                echo 'DB_PASSWORD=${{ secrets.IPPASSWORD }}' >> /opt/.env
+                echo 'DB_DIALECT=mysql' >> /opt/.env
+                echo 'DB_PORT=${{ secrets.PORT }}' >> /opt/.env
+                chown csye6225:csye6225 /opt/.env
+                systemctl restart webapp" \
+              --service-account=${{ secrets.SERVICEACCOUNTEMAIL }} \
+              --scopes=https://www.googleapis.com/auth/cloud-platform \
+              --create-disk=auto-delete=yes,boot=yes,device-name=Disk1,image="projects/devproject-414921/global/images/${{ steps.get_image.outputs.IMAGE_NAME }}",kms-key=${{ steps.get_vm_key.outputs.vmkey }},mode=rw,size=20,type=pd-balanced \
+              --tags=http-server
+        
 
     - name: Configure Instance Groups
       run: |
