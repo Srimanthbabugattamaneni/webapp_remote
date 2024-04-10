@@ -121,11 +121,17 @@ jobs:
               --create-disk=auto-delete=yes,boot=yes,device-name=Disk1,image="projects/devproject-414921/global/images/${{ steps.get_IMG_NAME.outputs.IMG_NAME }}",kms-key=${{ steps.get_vm_key.outputs.vmkey }},mode=rw,size=20,type=pd-balanced \
               --tags=http-server
         
+    - name : template name
+      id: get_template
+      run: |
+        template_name = $(gcloud compute images list --project ${{ secrets.PROJECT_ID }} --filter='name:custom-centos-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')
+        echo "::set-output name=template_name::$template_name"
+        
 
     - name: Configure Instance Groups
       run: |
         gcloud compute instance-groups managed rolling-action start-update ${{steps.get_instancemanager.outputs.instancemanager}} \
-          --version=template=https://compute.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/instanceTemplates/${{ steps.get_template.outputs.tempName }} \
+          --version=template=https://compute.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/instanceTemplates/${{ steps.get_template.outputs.template_name }} \
            --max-unavailable=3 \
           --max-surge=3 \
           --region=${{ secrets.REGION }}
