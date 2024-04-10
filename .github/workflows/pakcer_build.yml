@@ -64,11 +64,11 @@ jobs:
    #   run: packer build .
 #      working-directory: ./packer
 
-    - name: Get Latest Image 
+    - name: Get Latest Image Name
+      id: get_IMG_NAME
       run: |
-        echo "IMG_NAME=$(gcloud compute images list --project devproject-414921 --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')" >> $GITHUB_OUTPUT
-        echo "::set-output name=IMG_NAME::$IMG_NAME"
-        echo "IMG_NAME: $IMG_NAME"
+            IMG_NAME=$(gcloud compute images list --project devproject-414921 --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')
+            echo "::set-output name=IMG_NAME::$IMG_NAME"
 
     - name: Get  Instance Group Manager
       id: get_instancemanager
