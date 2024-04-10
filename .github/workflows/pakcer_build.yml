@@ -128,8 +128,7 @@ jobs:
           --version=template=https://compute.googleapis.com/compute/v1/projects/devproject-414921/regions/us-east1/instanceTemplates/${{ steps.get_template.outputs.tempName }} \
            --max-unavailable=3 \
           --max-surge=3 \
-          
-          --region=${{secrets.REGION}}
+          --region=${{ secrets.REGION }}
 
     - name: Monitoring the instances
       run: |
