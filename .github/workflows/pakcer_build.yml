@@ -7,15 +7,15 @@ env:
   databaseName: ${{ secrets.DATABASE }}
 
 on:
-  push:
-    branches:
-      - cicd
+  pull_request_target:
+     types: [closed]
+     branches: [ "main" ]
 
 
 
 jobs:
   build:
-    #if github.event.pull_request.merged true
+    if : github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
