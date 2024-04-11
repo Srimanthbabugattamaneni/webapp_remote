@@ -130,8 +130,8 @@ jobs:
 
     - name: Configure Instance Groups
       run: |
-           gcloud compute instance-groups managed rolling-action start-update ${{ steps.get_instancemanager.outputs.instancemanager }} \
-            --version=template=regions/us-east1/instanceTemplates/${{ steps.get_template.outputs.template_name }} \
+         gcloud compute instance-groups managed rolling-action start-update ${{ steps.get_instancemanager.outputs.instancemanager }} \
+            --version=template=global/instanceTemplates/${{ steps.get_template.outputs.template_name }} \
             --max-unavailable=3 \
             --max-surge=3 \
             --region=${{ secrets.REGION }}
@@ -142,3 +142,6 @@ jobs:
         gcloud compute instance-groups managed wait-until ${{steps.get_instancemanager.outputs.instancemanager}} \
           --version-target-reached \
           --region=${{secrets.REGION}}
+
+
+          gcloud compute instance-groups managed rolling-action start-update webapp-resource-manager --version=template=global/instanceTemplates/instance-template-20240410235736 --max-unavailable=3 --max-surge=3 --region=us-east1
