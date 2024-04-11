@@ -131,7 +131,7 @@ jobs:
     - name: Configure Instance Groups
       run: |
          gcloud compute instance-groups managed rolling-action start-update ${{ steps.get_instancemanager.outputs.instancemanager }} \
-            --version=template=global/instanceTemplates/${{ steps.get_template.outputs.template_name }} \
+            --version=template=${{ steps.get_template.outputs.template_name }} \
             --max-unavailable=3 \
             --max-surge=3 \
             --region=${{ secrets.REGION }}
