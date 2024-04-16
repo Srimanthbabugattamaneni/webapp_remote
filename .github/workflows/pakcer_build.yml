@@ -9,7 +9,7 @@ env:
 on:
   push:
     branches:
-      - cicd
+      - newcicd
 
 
 
@@ -141,7 +141,4 @@ jobs:
       run: |
         gcloud compute instance-groups managed wait-until ${{steps.get_instancemanager.outputs.instancemanager}} \
           --version-target-reached \
-          --region=${{secrets.REGION}}
-
-
-          gcloud compute instance-groups managed rolling-action start-update webapp-resource-manager --version=template=global/instanceTemplates/instance-template-20240410235736 --max-unavailable=3 --max-surge=3 --region=us-east1
+          --region=${{ secrets.REGION }}
