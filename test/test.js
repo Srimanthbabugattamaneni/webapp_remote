@@ -40,7 +40,7 @@ describe('Integration Tests', () => {
     this.timeout(10000);
 
     // Attempt to create account
-    let createResponse = await request.post('/v1/user').send(userData);
+    let createResponse = await request.post('/v6/user').send(userData);
     // The account may already exist from a previous test run
 
     if (createResponse.status === 201) {
@@ -55,12 +55,12 @@ describe('Integration Tests', () => {
     }
 
     // Validate account exists using Basic Auth
-    const getResponse = await request.get('/v1/user/self').auth(userData.username, userData.password);
+    const getResponse = await request.get('/v6/user/self').auth(userData.username, userData.password);
     expect(getResponse.status).to.equal(200, 'Failed to retrieve account');
     expect(getResponse.body.username).to.equal(userData.username);
 
     // Attempt to create the same account again, expecting a failure due to duplicate
-    createResponse = await request.post('/v1/user').send(userData);
+    createResponse = await request.post('/v6/user').send(userData);
     expect(createResponse.status).to.equal(400, 'Expected failure on duplicate account creation');
   });
 
@@ -75,7 +75,7 @@ describe('Integration Tests', () => {
     };
   
     // Update account using Basic Auth
-    const updateResponse = await request.put('/v1/user/self')
+    const updateResponse = await request.put('/v6/user/self')
       .auth(userData.username, userData.password)
       .send(updateData);
   
@@ -84,7 +84,7 @@ describe('Integration Tests', () => {
   
     if (updateResponse.status === 200) {
       // Validate account was updated only if the response was 200
-      const getResponse = await request.get('/v1/user/self')
+      const getResponse = await request.get('/v6/user/self')
         .auth(userData.username, userData.password);
       expect(getResponse.status).to.equal(200, 'Failed to retrieve account after update');
       expect(getResponse.body.first_name).to.equal(updateData.first_name);
