@@ -67,9 +67,10 @@ jobs:
     - name: Get Latest Image Name
       id: get_IMG_NAME
       run: |
-            IMG_NAME=$(gcloud compute images list --project devproject-414921 --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')
-            echo "::set-output name=IMG_NAME::$IMG_NAME"
-            echo "IMAGE: $IMAGE"
+             IMG_NAME=$(gcloud compute images list --project devproject-414921 --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')
+             echo "IMG_NAME=$IMG_NAME" >> $GITHUB_ENV
+             echo "LATEST IMAGE: $IMG_NAME"
+      shell: /usr/bin/bash -e
 
     - name: Get  Instance Group Manager
       id: get_instancemanager
